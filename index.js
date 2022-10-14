@@ -14,9 +14,9 @@ const CinemaRoute = require("./routes/Cinema");
 app.use(express.static(__dirname + "/"));
 dotenv.config();
 // connect database
-console.log(process.env.MONGODB_URL);
+
 mongoose
-  .connect(process.env.MONGODB_URL.toString(), {
+  .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

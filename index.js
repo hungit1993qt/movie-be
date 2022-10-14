@@ -1,4 +1,3 @@
-
 const express = require("express");
 const { engine } = require("express-handlebars");
 const cors = require("cors");
@@ -14,13 +13,13 @@ const CinemaBrandRoute = require("./routes/CinemaBrand");
 const CinemaSystemLocationRoute = require("./routes/CinemaSystemLocation");
 const CinemaRoute = require("./routes/Cinema");
 
-
 // connect database
 
 mongoose
   .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
   })
   .then(() => {
     console.log("connect to mongoDB");

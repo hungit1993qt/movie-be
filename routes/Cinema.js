@@ -3,7 +3,7 @@ const CinemaController = require("../controllers/Cinema");
 const router = require("express").Router();
 const upload = require("../middleware/uploadPicture");
 const verifyToken = require("../middleware/verifyToken");
-
+//
 router.post(
   "/",
   verifyToken.verifyTokenAPI,

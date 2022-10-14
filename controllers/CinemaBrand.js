@@ -18,8 +18,11 @@ const CinemaBrandController = {
   },
   getAllCinemaBrand: async (req, res) => {
     try {
-      const AllCinemaBrand = await CinemaBrand.find()
-        .populate({path:"cinemaSystemLocation",select:"-CinemaBrands -__v"})
+      const AllCinemaBrand = await CinemaBrand.find().select("-createdAt -updatedAt -__v")
+        .populate({
+          path: "cinemaSystemLocation",
+          select: "-CinemaBrands -__v -createdAt -updatedAt",
+        })
         .sort({ createdAt: -1 });
       res.status(200).json(AllCinemaBrand);
     } catch (error) {
@@ -30,7 +33,10 @@ const CinemaBrandController = {
     try {
       const detailCinemaBrand = await CinemaBrand.findById(
         req.params.id
-      ).populate({path:"cinemaSystemLocation",select:"-CinemaBrands -__v"})
+      ).select("-createdAt -updatedAt -__v").populate({
+        path: "cinemaSystemLocation",
+        select: "-CinemaBrands -__v -createdAt -updatedAt",
+      });
       res.status(200).json(detailCinemaBrand);
     } catch (error) {
       res.status(500).json(error);
@@ -43,8 +49,11 @@ const CinemaBrandController = {
           $regex: req.params.key.toString(),
           $options: "i",
         },
-      })
-        .populate({path:"cinemaSystemLocation",select:"-CinemaBrands -__v"})
+      }).select("-createdAt -updatedAt -__v")
+        .populate({
+          path: "cinemaSystemLocation",
+          select: "-CinemaBrands -__v -createdAt -updatedAt",
+        })
         .sort({ createdAt: -1 });
       res.status(200).json(cinemaBrandByName);
     } catch (error) {
@@ -84,7 +93,9 @@ const CinemaBrandController = {
           .status(500)
           .json(
             "Delete false, Cinema Brand have " +
-              "("+foundCinemaBrand.cinemaSystemLocation.length +")"+
+              "(" +
+              foundCinemaBrand.cinemaSystemLocation.length +
+              ")" +
               " Cinema System Location"
           );
       } else {

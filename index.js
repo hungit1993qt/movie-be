@@ -45,3 +45,4 @@ app.get("/", (req, res) => {
 app.use("/api/cinemabrand/", CinemaBrandRoute);
 app.use("/api/cinemasystemlocation/", CinemaSystemLocationRoute);
 app.use("/api/cinema/", CinemaRoute);
+//check update

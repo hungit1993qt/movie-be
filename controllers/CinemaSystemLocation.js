@@ -22,6 +22,7 @@ const CinemaSystemLocationController = {
   getAllCinemaSystemLocation: async (req, res) => {
     try {
       const AllCinemaSystemLocation = await CinemaSystemLocation.find()
+        .select("-createdAt -updatedAt -__v")
         .populate({
           path: "CinemaBrands",
           select: "codeCinemaBrand nameCinemaBrand logoCinemaBrand",
@@ -38,10 +39,12 @@ const CinemaSystemLocationController = {
     try {
       const detailCinemaSystemLocation = await CinemaSystemLocation.findById(
         req.params.id
-      ).populate({
-        path: "CinemaBrands",
-        select: "codeCinemaBrand nameCinemaBrand logoCinemaBrand",
-      });
+      )
+        .select("-createdAt -updatedAt -__v")
+        .populate({
+          path: "CinemaBrands",
+          select: "codeCinemaBrand nameCinemaBrand logoCinemaBrand",
+        });
       res.status(200).json(detailCinemaSystemLocation);
     } catch (error) {
       res.status(500).json(error);
@@ -55,10 +58,10 @@ const CinemaSystemLocationController = {
           $options: "i",
         },
       })
+        .select("-createdAt -updatedAt -__v")
         .populate({
           path: "CinemaBrands",
-          select:
-            "codeCinemaBrand nameCinemaBrand logoCinemaBrand createdAt updatedAt",
+          select: "codeCinemaBrand nameCinemaBrand logoCinemaBrand",
         })
         .sort({ createdAt: -1 });
       res.status(200).json(CinemaSystemLocationByName);
@@ -82,7 +85,9 @@ const CinemaSystemLocationController = {
   },
   deleteCinemaSystemLocation: async (req, res) => {
     try {
-      const foundCinemaSystemLocation = await CinemaSystemLocation.findById(req.params.id);
+      const foundCinemaSystemLocation = await CinemaSystemLocation.findById(
+        req.params.id
+      );
       if (foundCinemaSystemLocation.cinemas.length > 0) {
         res
           .status(500)

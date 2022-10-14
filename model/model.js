@@ -198,7 +198,7 @@ const ReviewSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
     },
   },
-  { timestamps : true}
+  { timestamps: true }
 );
 const UserSchema = new mongoose.Schema(
   {
@@ -227,7 +227,7 @@ const UserSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps : true}
+  { timestamps: true }
 );
 
 let CinemaBrand = mongoose.model("CinemaBrand", CinemaBrandSchema);

@@ -28,13 +28,13 @@ const CinemaController = {
   },
   getAllCinema: async (req, res) => {
     try {
-      const allCinema = await Cinema.find()
+      const allCinema = await Cinema.find().select("-createdAt -updatedAt -__v")
         .populate({
           path: "cinemaSystemLocation",
-          select: "-cinemas -__v",
+          select: "-cinemas -__v -createdAt -updatedAt",
           populate: {
             path: "CinemaBrands",
-            select: "-cinemaSystemLocation -__v",
+            select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
           },
         })
         .sort({ createdAt: -1 });
@@ -47,13 +47,13 @@ const CinemaController = {
     try {
       const cinemaByName = await Cinema.find({
         nameCinema: { $regex: req.params.key.toString(), $options: "i" },
-      })
+      }).select("-createdAt -updatedAt -__v -createdAt -updatedAt")
         .populate({
           path: "cinemaSystemLocation",
-          select: "-cinemas -__v",
+          select: "-cinemas -__v -createdAt -updatedAt",
           populate: {
             path: "CinemaBrands",
-            select: "-cinemaSystemLocation -__v",
+            select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
           },
         })
         .sort({
@@ -66,12 +66,12 @@ const CinemaController = {
   },
   findCinemaDetail: async (req, res) => {
     try {
-      const cinemaDetail = await Cinema.findById(req.params.id).populate({
+      const cinemaDetail = await Cinema.findById(req.params.id).select("-createdAt -updatedAt -__v ").populate({
         path: "cinemaSystemLocation",
-        select: "-cinemas -__v",
+        select: "-cinemas -__v -createdAt -updatedAt",
         populate: {
           path: "CinemaBrands",
-          select: "-cinemaSystemLocation -__v",
+          select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
         },
       });
       res.status(200).json(cinemaDetail);

@@ -1,3 +1,4 @@
+app.use(express.static(__dirname + "/"));
 const express = require("express");
 const { engine } = require("express-handlebars");
 const cors = require("cors");
@@ -11,7 +12,6 @@ const CinemaBrandRoute = require("./routes/CinemaBrand");
 const CinemaSystemLocationRoute = require("./routes/CinemaSystemLocation");
 const CinemaRoute = require("./routes/Cinema");
 
-app.use(express.static(__dirname + "/"));
 dotenv.config();
 // connect database
 

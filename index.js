@@ -1,8 +1,9 @@
-app.use(express.static(__dirname + "/"));
+
 const express = require("express");
 const { engine } = require("express-handlebars");
 const cors = require("cors");
 const app = express();
+app.use(express.static(__dirname + "/"));
 const mongoose = require("mongoose");
 var bodyParser = require("body-parser");
 const morgan = require("morgan");

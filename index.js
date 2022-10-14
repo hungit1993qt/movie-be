@@ -7,7 +7,7 @@ const mongoose = require("mongoose");
 var bodyParser = require("body-parser");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
-dotenv.config({ path: "./config.env" });
+dotenv.config({ path: "./.env" });
 const cookieParser = require("cookie-parser");
 const CinemaBrandRoute = require("./routes/CinemaBrand");
 const CinemaSystemLocationRoute = require("./routes/CinemaSystemLocation");

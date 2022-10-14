@@ -8,12 +8,13 @@ const mongoose = require("mongoose");
 var bodyParser = require("body-parser");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
+dotenv.config();
 const cookieParser = require("cookie-parser");
 const CinemaBrandRoute = require("./routes/CinemaBrand");
 const CinemaSystemLocationRoute = require("./routes/CinemaSystemLocation");
 const CinemaRoute = require("./routes/Cinema");
 
-dotenv.config();
+
 // connect database
 
 mongoose

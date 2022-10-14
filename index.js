@@ -16,7 +16,7 @@ dotenv.config();
 // connect database
 
 mongoose
-  .connect("mongodb+srv://movieapp:859708@cluster0.6yoiclp.mongodb.net/?retryWrites=true&w=majority", {
+  .connect(`${process.env.MONGODB_URL}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })

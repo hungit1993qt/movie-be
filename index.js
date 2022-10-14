@@ -16,13 +16,13 @@ dotenv.config();
 // connect database
 
 mongoose
-  .connect(process.env.MONGODB_URL, {
+  .connect("mongodb+srv://movieapp:859708@cluster0.6yoiclp.mongodb.net/?retryWrites=true&w=majority", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => {
     console.log("connect to mongoDB");
-    app.listen(process.env.PORT || 8000, () => {
+    app.listen(process.env.PORT || 8080, () => {
       console.log("Server running...");
     });
   });

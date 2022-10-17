@@ -10,7 +10,7 @@ const CinemaController = {
         cinemaSystemLocation: req.body.cinemaSystemLocation,
       });
       if (req.file) {
-        newCinema.pictureCinema = "http://localhost:8000/" + req.file.path;
+        newCinema.pictureCinema = "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path;
       }
       const savedCinema = await newCinema.save();
       if (req.body.cinemaSystemLocation) {
@@ -115,7 +115,7 @@ const CinemaController = {
             addressCinema: req.body.addressCinema,
             hotlineCinema: req.body.hotlineCinema,
             cinemaSystemLocation: req.body.cinemaSystemLocation,
-            pictureCinema: "http://localhost:8000/" + req.file.path,
+            pictureCinema: "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path,
           },
         });
       } else {

@@ -28,7 +28,7 @@ const MovieController = {
         hotMovie: req.body.hotMovie,
       });
       if (req.file) {
-        newMovie.pictureMovie = "http://localhost:8000/" + req.file.path;
+        newMovie.pictureMovie = "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path;
       }
 
       const savedMovie = await newMovie.save();
@@ -151,7 +151,7 @@ const MovieController = {
       });
       if (req.file) {
         await updateMovie.updateOne({
-          pictureMovie: "http://localhost:8000/" + req.file.path,
+          pictureMovie: "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path,
         });
       }
       res.status(200).json("Update successfuly");

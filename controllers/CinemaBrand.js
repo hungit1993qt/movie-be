@@ -8,7 +8,7 @@ const CinemaBrandController = {
       });
       if (req.file) {
         newCinemaBrand.logoCinemaBrand =
-          "http://localhost:8000/" + req.file.path;
+          "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path;
       }
       const savedCinemaBrand = await newCinemaBrand.save();
       res.status(200).json(savedCinemaBrand);
@@ -68,7 +68,7 @@ const CinemaBrandController = {
           $set: {
             codeCinemaBrand: req.body.codeCinemaBrand,
             nameCinemaBrand: req.body.nameCinemaBrand,
-            logoCinemaBrand: "http://localhost:8000/" + req.file.path,
+            logoCinemaBrand: "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path,
           },
         });
       } else {

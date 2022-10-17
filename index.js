@@ -2,6 +2,27 @@ const express = require("express");
 const { engine } = require("express-handlebars");
 const cors = require("cors");
 const app = express();
+const swaggerUi = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
+
+const option = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Movie API",
+      version: "1.0.0",
+      description: "A simple Express Movie API",
+    },
+    servers: [
+      {
+        url: "https://hungit1993qt-movie-be.herokuapp.com/",
+      },
+    ],
+  },
+  apis: ["./routes/*.js"],
+};
+const specs = swaggerJsDoc(option);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.use(express.static(__dirname + "/"));
 const mongoose = require("mongoose");
 var bodyParser = require("body-parser");
@@ -47,12 +68,12 @@ app.get("/", (req, res) => {
 
 //Routs
 
-app.use("/api/cinema-brand/", CinemaBrandRoute);
-app.use("/api/cinema-system-location/", CinemaSystemLocationRoute);
-app.use("/api/cinema/", CinemaRoute);
-app.use("/api/cinema-room/", CinemaRoomRoute);
-app.use("/api/movie-schedule/", MovieScheduleRoute);
-app.use("/api/movie/", MovieRoute);
-app.use("/api/review/", ReviewRoute);
-app.use("/api/user/", UserRoute);
+app.use("/cinema-brand/", CinemaBrandRoute);
+app.use("cinema-system-location/", CinemaSystemLocationRoute);
+app.use("cinema/", CinemaRoute);
+app.use("cinema-room/", CinemaRoomRoute);
+app.use("/movie-schedule/", MovieScheduleRoute);
+app.use("/movie/", MovieRoute);
+app.use("review/", ReviewRoute);
+app.use("user/", UserRoute);
 //check update

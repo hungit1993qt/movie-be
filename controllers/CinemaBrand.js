@@ -21,7 +21,7 @@ const CinemaBrandController = {
       const AllCinemaBrand = await CinemaBrand.find().select("-createdAt -updatedAt -__v")
         .populate({
           path: "cinemaSystemLocation",
-          select: "-CinemaBrands -__v -createdAt -updatedAt",
+          select: "-CinemaBrands -__v -createdAt -updatedAt -cinemas",
         })
         .sort({ createdAt: -1 });
       res.status(200).json(AllCinemaBrand);
@@ -35,7 +35,7 @@ const CinemaBrandController = {
         req.params.id
       ).select("-createdAt -updatedAt -__v").populate({
         path: "cinemaSystemLocation",
-        select: "-CinemaBrands -__v -createdAt -updatedAt",
+        select: "-CinemaBrands -__v -createdAt -updatedAt -cinemas",
       });
       res.status(200).json(detailCinemaBrand);
     } catch (error) {
@@ -52,7 +52,7 @@ const CinemaBrandController = {
       }).select("-createdAt -updatedAt -__v")
         .populate({
           path: "cinemaSystemLocation",
-          select: "-CinemaBrands -__v -createdAt -updatedAt",
+          select: "-CinemaBrands -__v -createdAt -updatedAt -cinemas",
         })
         .sort({ createdAt: -1 });
       res.status(200).json(cinemaBrandByName);

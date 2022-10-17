@@ -28,15 +28,23 @@ const CinemaController = {
   },
   getAllCinema: async (req, res) => {
     try {
-      const allCinema = await Cinema.find().select("-createdAt -updatedAt -__v")
-        .populate({
-          path: "cinemaSystemLocation",
-          select: "-cinemas -__v -createdAt -updatedAt",
-          populate: {
-            path: "CinemaBrands",
-            select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
+      const allCinema = await Cinema.find()
+        .select("-createdAt -updatedAt -__v")
+        .populate([
+          {
+            path: "cinemaSystemLocation",
+
+            select: "-cinemas -__v -createdAt -updatedAt",
+            populate: {
+              path: "CinemaBrands",
+              select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
+            },
           },
-        })
+          {
+            path: "cinemaRoom",
+            select: " -__v -createdAt -updatedAt",
+          },
+        ])
         .sort({ createdAt: -1 });
       res.status(200).json(allCinema);
     } catch (error) {
@@ -47,15 +55,23 @@ const CinemaController = {
     try {
       const cinemaByName = await Cinema.find({
         nameCinema: { $regex: req.params.key.toString(), $options: "i" },
-      }).select("-createdAt -updatedAt -__v -createdAt -updatedAt")
-        .populate({
-          path: "cinemaSystemLocation",
-          select: "-cinemas -__v -createdAt -updatedAt",
-          populate: {
-            path: "CinemaBrands",
-            select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
+      })
+        .select("-createdAt -updatedAt -__v -createdAt -updatedAt")
+        .populate([
+          {
+            path: "cinemaSystemLocation",
+
+            select: "-cinemas -__v -createdAt -updatedAt",
+            populate: {
+              path: "CinemaBrands",
+              select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
+            },
           },
-        })
+          {
+            path: "cinemaRoom",
+            select: " -__v -createdAt -updatedAt",
+          },
+        ])
         .sort({
           createdAt: -1,
         });
@@ -66,14 +82,23 @@ const CinemaController = {
   },
   findCinemaDetail: async (req, res) => {
     try {
-      const cinemaDetail = await Cinema.findById(req.params.id).select("-createdAt -updatedAt -__v ").populate({
-        path: "cinemaSystemLocation",
-        select: "-cinemas -__v -createdAt -updatedAt",
-        populate: {
-          path: "CinemaBrands",
-          select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
-        },
-      });
+      const cinemaDetail = await Cinema.findById(req.params.id)
+        .select("-createdAt -updatedAt -__v ")
+        .populate([
+          {
+            path: "cinemaSystemLocation",
+
+            select: "-cinemas -__v -createdAt -updatedAt",
+            populate: {
+              path: "CinemaBrands",
+              select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
+            },
+          },
+          {
+            path: "cinemaRoom",
+            select: " -__v -createdAt -updatedAt",
+          },
+        ]);
       res.status(200).json(cinemaDetail);
     } catch (error) {
       res.status(500).json(error);
@@ -111,15 +136,32 @@ const CinemaController = {
   },
   deleteCinema: async (req, res) => {
     try {
-      await CinemaSystemLocation.updateMany(
-        {
-          cinemas: req.params.id,
-        },
-        {
-          $pull: { cinemas: req.params.id },
-        }
+      const foundCinema = await Cinema.findById(
+        req.params.id
       );
-      await Cinema.findByIdAndDelete(req.params.id);
+      if (foundCinema.cinemaRoom.length > 0) {
+        res
+          .status(500)
+          .json(
+            "Delete false, Cinema have " +
+              "(" +
+              foundCinema.cinemaRoom.length +
+              ")" +
+              " cinema room "
+          );
+      } else {
+        await CinemaSystemLocation.updateMany(
+          {
+            cinemas: req.params.id,
+          },
+          {
+            $pull: { cinemas: req.params.id },
+          }
+        );
+        await Cinema.findByIdAndDelete(req.params.id);
+        res.status(200).json("Delete successfuly");
+      }
+     
     } catch (error) {
       res.status(500).json(error);
     }

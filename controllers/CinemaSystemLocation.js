@@ -23,10 +23,16 @@ const CinemaSystemLocationController = {
     try {
       const AllCinemaSystemLocation = await CinemaSystemLocation.find()
         .select("-createdAt -updatedAt -__v")
-        .populate({
-          path: "CinemaBrands",
-          select: "codeCinemaBrand nameCinemaBrand logoCinemaBrand",
-        })
+        .populate([
+          {
+            path: "CinemaBrands",
+            select: "codeCinemaBrand nameCinemaBrand logoCinemaBrand",
+          },
+          {
+            path: "cinemas",
+            select: "_id codeCinema nameCinema addressCinema hotlineCinema",
+          },
+        ])
         .sort({
           createdAt: -1,
         });
@@ -41,10 +47,16 @@ const CinemaSystemLocationController = {
         req.params.id
       )
         .select("-createdAt -updatedAt -__v")
-        .populate({
-          path: "CinemaBrands",
-          select: "codeCinemaBrand nameCinemaBrand logoCinemaBrand",
-        });
+        .populate([
+          {
+            path: "CinemaBrands",
+            select: "codeCinemaBrand nameCinemaBrand logoCinemaBrand",
+          },
+          {
+            path: "cinemas",
+            select: "_id codeCinema nameCinema addressCinema hotlineCinema",
+          },
+        ]);
       res.status(200).json(detailCinemaSystemLocation);
     } catch (error) {
       res.status(500).json(error);
@@ -59,10 +71,16 @@ const CinemaSystemLocationController = {
         },
       })
         .select("-createdAt -updatedAt -__v")
-        .populate({
-          path: "CinemaBrands",
-          select: "codeCinemaBrand nameCinemaBrand logoCinemaBrand",
-        })
+        .populate([
+          {
+            path: "CinemaBrands",
+            select: "codeCinemaBrand nameCinemaBrand logoCinemaBrand",
+          },
+          {
+            path: "cinemas",
+            select: "_id codeCinema nameCinema addressCinema hotlineCinema",
+          },
+        ])
         .sort({ createdAt: -1 });
       res.status(200).json(CinemaSystemLocationByName);
     } catch (error) {
@@ -99,11 +117,11 @@ const CinemaSystemLocationController = {
               " Cinema "
           );
       } else {
-        // await CinemaBrand.updateMany(
-        //   { cinemaSystemLocation: req.params.id },
-        //   { $pull: { cinemaSystemLocation: req.params.id } }
-        // );
-        // await CinemaSystemLocation.findByIdAndDelete(req.params.id);
+        await CinemaBrand.updateMany(
+          { cinemaSystemLocation: req.params.id },
+          { $pull: { cinemaSystemLocation: req.params.id } }
+        );
+        await CinemaSystemLocation.findByIdAndDelete(req.params.id);
         res.status(200).json("Delete successfuly");
       }
     } catch (error) {

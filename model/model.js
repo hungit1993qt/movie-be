@@ -76,10 +76,10 @@ const CinemaSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "CinemaSystemLocation",
     },
-    cinimaRoom: [
+    cinemaRoom: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "CinimaRoom",
+        ref: "CinemaRoom",
       },
     ],
   },
@@ -87,19 +87,19 @@ const CinemaSchema = new mongoose.Schema(
 );
 const CinemaRoomSchema = new mongoose.Schema(
   {
-    codeCinimaRoom: {
+    codeCinemaRoom: {
       type: String,
       requỉed: true,
     },
-    nameCinimaRoom: {
+    nameCinemaRoom: {
       type: String,
       requỉed: true,
     },
-    locationCinimaRoom: {
+    locationCinemaRoom: {
       type: String,
       requỉed: true,
     },
-    cinima: {
+    cinema: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Cinema",
     },
@@ -126,7 +126,7 @@ const MovieScheduleSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    cinimaRoom: {
+    cinemaRoom: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "CinemaRoom",
     },
@@ -149,6 +149,10 @@ const MovieSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    slugMovie: {
+      type: String,
+      required: true,
+    },
     pictureMovie: {
       type: String,
       required: true,
@@ -168,7 +172,7 @@ const MovieSchema = new mongoose.Schema(
     movieSchedule: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Movie",
+        ref: "MovieSchedule",
       },
     ],
     review: [
@@ -188,6 +192,8 @@ const ReviewSchema = new mongoose.Schema(
     },
     rankReview: {
       type: Number,
+      min: 0,
+      max: 10,
       required: true,
     },
     movie: {
@@ -196,6 +202,7 @@ const ReviewSchema = new mongoose.Schema(
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
   },
   { timestamps: true }
@@ -226,6 +233,22 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    avatar: {
+      type: String,
+      required: true,
+    },
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
+    orders: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        // ref: "Order",
+      },
+    ],
   },
   { timestamps: true }
 );

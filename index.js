@@ -12,6 +12,11 @@ const cookieParser = require("cookie-parser");
 const CinemaBrandRoute = require("./routes/CinemaBrand");
 const CinemaSystemLocationRoute = require("./routes/CinemaSystemLocation");
 const CinemaRoute = require("./routes/Cinema");
+const CinemaRoomRoute = require("./routes/CinemaRoom");
+const MovieScheduleRoute = require("./routes/MovieSchedule");
+const MovieRoute = require("./routes/Movie");
+const ReviewRoute = require("./routes/Review");
+const UserRoute = require("./routes/User");
 
 // connect database
 
@@ -22,7 +27,7 @@ mongoose
   })
   .then(() => {
     console.log("connect to mongoDB");
-    app.listen(process.env.PORT || 8080, () => {
+    app.listen(process.env.PORT || 8000, () => {
       console.log("Server running...");
     });
   });
@@ -42,7 +47,12 @@ app.get("/", (req, res) => {
 
 //Routs
 
-app.use("/api/cinemabrand/", CinemaBrandRoute);
-app.use("/api/cinemasystemlocation/", CinemaSystemLocationRoute);
+app.use("/api/cinema-brand/", CinemaBrandRoute);
+app.use("/api/cinema-system-location/", CinemaSystemLocationRoute);
 app.use("/api/cinema/", CinemaRoute);
+app.use("/api/cinema-room/", CinemaRoomRoute);
+app.use("/api/movie-schedule/", MovieScheduleRoute);
+app.use("/api/movie/", MovieRoute);
+app.use("/api/review/", ReviewRoute);
+app.use("/api/user/", UserRoute);
 //check update

@@ -10,7 +10,7 @@ const UserController = {
         phoneNumberUser: req.body.phoneNumberUser,
       });
       if (req.file) {
-        newUser.avatar = "http://localhost:8000/" + req.file.path;
+        newUser.avatar = "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path;
       }
       const savedUser = await newUser.save();
 
@@ -86,7 +86,7 @@ const UserController = {
             passwordUser: req.body.passwordUser,
             nameUser: req.body.nameUser,
             emailUser: req.body.emailUser,
-            avatar: "http://localhost:8000/" + req.file.path,
+            avatar: "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path,
           },
         });
       } else {

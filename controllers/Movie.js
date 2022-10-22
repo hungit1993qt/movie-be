@@ -114,7 +114,7 @@ const MovieController = {
           },        
           {
             path: "review",
-            select: "-movie -__v -createdAt -updatedAt",
+            select: "-movie -__v",
             populate: {
               path: "user",
               select: "-reviews -__v -createdAt -updatedAt",

@@ -126,6 +126,10 @@ const MovieSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    categoryMovie: {
+      type: String,
+      default: false,
+    },
     hotMovie: {
       type: Boolean,
       default: false,

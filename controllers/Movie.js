@@ -88,6 +88,21 @@ const MovieController = {
   //     res.status(500).json(error);
   //   }
   // },
+  addCategory: async (req, res) => {
+    try {
+      const movie = await Movie.findById(req.body.id);
+      if (req.body.categoryMovie) {
+        await movie.updateOne({
+          $set: {
+            categoryMovie: req.body.categoryMovie,
+          },
+        });
+        res.status(200).json("Add category successfully");
+      }
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
   getAllMovie: async (req, res) => {
     try {
       const allMovie = await Movie.find()
@@ -95,15 +110,16 @@ const MovieController = {
         .populate([
           {
             path: "movieSchedule",
-            select: " -__v",
-          },
+            select: "-movie -__v",
+          },        
           {
             path: "review",
-            select: " -__v -createdAt -updatedAt",
-          },
-          {
-            path: "cinema",
-            select: "-movies -__v -createdAt -updatedAt",
+            select: "-movie -__v -createdAt -updatedAt",
+            populate: {
+              path: "user",
+              select: "-reviews -__v -createdAt -updatedAt",
+             
+            },
           },
         ])
         .sort({ createdAt: -1 });
@@ -133,10 +149,15 @@ const MovieController = {
           {
             path: "movieSchedule",
             select: "-movie -__v",
-          },
+          },        
           {
             path: "review",
-            select: "-Movie -__v -createdAt -updatedAt",
+            select: "-movie -__v -createdAt -updatedAt",
+            populate: {
+              path: "user",
+              select: "-reviews -__v -createdAt -updatedAt",
+             
+            },
           },
         ])
         .sort({ createdAt: -1 })
@@ -162,10 +183,15 @@ const MovieController = {
           {
             path: "movieSchedule",
             select: "-movie -__v",
-          },
+          },        
           {
             path: "review",
-            select: "-Movie -__v -createdAt -updatedAt",
+            select: "-movie -__v -createdAt -updatedAt",
+            populate: {
+              path: "user",
+              select: "-reviews -__v -createdAt -updatedAt",
+             
+            },
           },
         ])
         .sort({
@@ -188,10 +214,15 @@ const MovieController = {
           {
             path: "movieSchedule",
             select: "-movie -__v",
-          },
+          },        
           {
             path: "review",
-            select: "-Movie -__v -createdAt -updatedAt",
+            select: "-movie -__v -createdAt -updatedAt",
+            populate: {
+              path: "user",
+              select: "-reviews -__v -createdAt -updatedAt",
+             
+            },
           },
         ]);
       res.status(200).json(MovieDetail);

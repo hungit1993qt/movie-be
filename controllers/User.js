@@ -1,5 +1,7 @@
 const { Review, User } = require("../model/model");
 const fs = require("fs");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 function convertPath(str) {
   str = str.replace(/\\/g, "/");
   return str;
@@ -8,9 +10,11 @@ const UserController = {
   addUser: async (req, res) => {
     try {
       const fullUrl = req.protocol + "://" + req.get("host") + "/";
+      const salt = await bcrypt.genSalt(10);
+      const hashed = await bcrypt.hash(req.body.passwordUser, salt);
       const newUser = new User({
         accountUser: req.body.accountUser,
-        passwordUser: req.body.passwordUser,
+        passwordUser: hashed,
         nameUser: req.body.nameUser,
         emailUser: req.body.emailUser,
         phoneNumberUser: req.body.phoneNumberUser,
@@ -30,7 +34,18 @@ const UserController = {
       const allUser = await User.find()
         .select("-__v")
         .populate([
-          { path: "reviews", select: "-__v" },
+          {
+            path: "reviews",
+            select: "-__v",
+            // populate: {
+            //   path: "user",
+            //   select: "-__v",
+            // },
+            // populate: {
+            //   path: "movie",
+            //   select: "-__v",
+            // },
+          },
           { path: "orders", select: "-__v" },
         ])
         .sort({ createdAt: -1 });
@@ -84,6 +99,8 @@ const UserController = {
   },
   updateUser: async (req, res) => {
     try {
+      const salt = await bcrypt.genSalt(10);
+      const hashed = await bcrypt.hash(req.body.passwordUser, salt);
       const fullUrl = req.protocol + "://" + req.get("host") + "/";
       const updateUser = await User.findById(req.body.id);
       if (req.file) {
@@ -103,7 +120,7 @@ const UserController = {
         await updateUser.updateOne({
           $set: {
             accountUser: req.body.accountUser,
-            passwordUser: req.body.passwordUser,
+            passwordUser: hashed,
             nameUser: req.body.nameUser,
             phoneNumberUser: req.body.phoneNumberUser,
             emailUser: req.body.emailUser,
@@ -114,7 +131,7 @@ const UserController = {
         await updateUser.updateOne({
           $set: {
             accountUser: req.body.accountUser,
-            passwordUser: req.body.passwordUser,
+            passwordUser: hashed,
             phoneNumberUser: req.body.phoneNumberUser,
             nameUser: req.body.nameUser,
             emailUser: req.body.emailUser,

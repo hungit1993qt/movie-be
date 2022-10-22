@@ -18,6 +18,13 @@ router.post(
 
   MovieController.addMovieToSchedele
 );
+router.post(
+  "/add-category/",
+  verifyToken.verifyTokenAPI,
+  //   verifyToken.verifyTokenManager,
+
+  MovieController.addCategory
+);
 router.get("/all/", verifyToken.verifyTokenAPI, MovieController.getAllMovie);
 router.get(
   "/pagination",

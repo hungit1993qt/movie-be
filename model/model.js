@@ -17,30 +17,6 @@ const CinemaBrandSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    cinemaSystemLocation: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "CinemaSystemLocation",
-      },
-    ],
-  },
-  { timestamps: true }
-);
-
-const CinemaSystemLocationSchema = new mongoose.Schema(
-  {
-    codeCinemaSystemLocation: {
-      type: String,
-      required: true,
-    },
-    nameCinemaSystemLocation: {
-      type: String,
-      required: true,
-    },
-    CinemaBrands: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "CinemaBrand",
-    },
     cinemas: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -50,6 +26,7 @@ const CinemaSystemLocationSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
 const CinemaSchema = new mongoose.Schema(
   {
     codeCinema: {
@@ -72,46 +49,26 @@ const CinemaSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    cinemaSystemLocation: {
+    cinemaBrand: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "CinemaSystemLocation",
+      ref: "CinemaBrand",
     },
-    cinemaRoom: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "CinemaRoom",
-      },
-    ],
-  },
-  { timestamps: true }
-);
-const CinemaRoomSchema = new mongoose.Schema(
-  {
-    codeCinemaRoom: {
-      type: String,
-      requỉed: true,
-    },
-    nameCinemaRoom: {
-      type: String,
-      requỉed: true,
-    },
-    locationCinemaRoom: {
-      type: String,
-      requỉed: true,
-    },
-    cinema: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Cinema",
-    },
-    movieSchedule: [
+    scheduls: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "MovieSchedule",
       },
     ],
+    movies: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Movie",
+      },
+    ],
   },
   { timestamps: true }
 );
+
 const MovieScheduleSchema = new mongoose.Schema(
   {
     codeMovieSchedule: {
@@ -126,9 +83,9 @@ const MovieScheduleSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    cinemaRoom: {
+    cinema: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "CinemaRoom",
+      ref: "Cinema",
     },
     movie: [
       {
@@ -149,11 +106,23 @@ const MovieSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    description: {
+      type: String,
+      required: true,
+    },
     slugMovie: {
       type: String,
       required: true,
     },
     pictureMovie: {
+      type: String,
+      required: true,
+    },
+    thumbnailMovie: {
+      type: String,
+      required: true,
+    },
+    trainlerMovie: {
       type: String,
       required: true,
     },
@@ -169,6 +138,11 @@ const MovieSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    cinema: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Cinema",
+    },
+
     movieSchedule: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -254,12 +228,8 @@ const UserSchema = new mongoose.Schema(
 );
 
 let CinemaBrand = mongoose.model("CinemaBrand", CinemaBrandSchema);
-let CinemaSystemLocation = mongoose.model(
-  "CinemaSystemLocation",
-  CinemaSystemLocationSchema
-);
+
 let Cinema = mongoose.model("Cinema", CinemaSchema);
-let CinemaRoom = mongoose.model("CinemaRoom", CinemaRoomSchema);
 let MovieSchedule = mongoose.model("MovieSchedule", MovieScheduleSchema);
 let Movie = mongoose.model("Movie", MovieSchema);
 let Review = mongoose.model("Review", ReviewSchema);
@@ -267,9 +237,7 @@ let User = mongoose.model("User", UserSchema);
 
 module.exports = {
   CinemaBrand,
-  CinemaSystemLocation,
   Cinema,
-  CinemaRoom,
   MovieSchedule,
   Movie,
   Review,

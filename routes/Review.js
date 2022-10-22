@@ -4,32 +4,32 @@ const router = require("express").Router();
 const verifyToken = require("../middleware/verifyToken");
 //
 router.post(
-  "/",
+  "/add/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
 
   ReviewController.addReview
 );
-router.get("/", verifyToken.verifyTokenAPI, ReviewController.getAllReview);
+router.get("/all/", verifyToken.verifyTokenAPI, ReviewController.getAllReview);
 router.get(
-  "/:key",
+  "/search-name/",
   verifyToken.verifyTokenAPI,
   ReviewController.findReviewByName
 );
 router.get(
-  "/detail/:id",
+  "/detail/",
   verifyToken.verifyTokenAPI,
   ReviewController.findReviewDetail
 );
 router.put(
-  "/:id",
+  "/update/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
 
   ReviewController.updateReview
 );
 router.delete(
-  "/:id",
+  "/delete/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
   ReviewController.deleteReview

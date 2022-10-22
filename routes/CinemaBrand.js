@@ -1,40 +1,40 @@
 const CinemaBrandController = require("../controllers/CinemaBrand");
 
 const router = require("express").Router();
-const upload = require("../middleware/uploadPicture");
+const upload = require("../middleware/uploadPictureCinemaBrand");
 const verifyToken = require("../middleware/verifyToken");
 
 router.post(
-  "/",
+  "/add/",
   verifyToken.verifyTokenAPI,
 //   verifyToken.verifyTokenManager,
   upload.single("logoCinemaBrand"),
   CinemaBrandController.addCinemaBrand
 );
 router.get(
-  "/",
+  "/all/",
   verifyToken.verifyTokenAPI,
   CinemaBrandController.getAllCinemaBrand
 );
 router.get(
-  "/:key",
+  "/search-name/",
   verifyToken.verifyTokenAPI,
   CinemaBrandController.findCinemaBrandByName
 );
 router.get(
-  "/detail/:id",
+  "/detail/",
   verifyToken.verifyTokenAPI,
   CinemaBrandController.findDetailCinemaBrand
 );
 router.put(
-  "/:id",
+  "/update/",
   verifyToken.verifyTokenAPI,
 //   verifyToken.verifyTokenManager,
   upload.single("logoCinemaBrand"),
   CinemaBrandController.updateCinemaBrand
 );
 router.delete(
-  "/:id",
+  "/delete/",
   verifyToken.verifyTokenAPI,
 //   verifyToken.verifyTokenManager,
   CinemaBrandController.deleteCinemaBrand

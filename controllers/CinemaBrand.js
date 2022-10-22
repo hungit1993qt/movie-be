@@ -1,14 +1,20 @@
 const { CinemaBrand } = require("../model/model");
+const fs = require("fs");
+function convertPath(str) {
+  str = str.replace(/\\/g, "/");
+  return str;
+}
 const CinemaBrandController = {
   addCinemaBrand: async (req, res) => {
     try {
+      const fullUrl = req.protocol + "://" + req.get("host") + "/";
       const newCinemaBrand = new CinemaBrand({
         codeCinemaBrand: req.body.codeCinemaBrand,
         nameCinemaBrand: req.body.nameCinemaBrand,
       });
       if (req.file) {
         newCinemaBrand.logoCinemaBrand =
-          "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path;
+        fullUrl + req.file.path;
       }
       const savedCinemaBrand = await newCinemaBrand.save();
       res.status(200).json(savedCinemaBrand);
@@ -18,10 +24,15 @@ const CinemaBrandController = {
   },
   getAllCinemaBrand: async (req, res) => {
     try {
-      const AllCinemaBrand = await CinemaBrand.find().select("-createdAt -updatedAt -__v")
+      const AllCinemaBrand = await CinemaBrand.find()
+        .select("-createdAt -updatedAt -__v")
         .populate({
-          path: "cinemaSystemLocation",
-          select: "-CinemaBrands -__v -createdAt -updatedAt -cinemas",
+          path: "cinemas",
+          select: "-cinemaBrand -__v -createdAt -updatedAt",
+          populate: {
+            path: "movies",
+            select: "-cinemas -__v -createdAt -updatedAt",
+          },
         })
         .sort({ createdAt: -1 });
       res.status(200).json(AllCinemaBrand);
@@ -31,12 +42,12 @@ const CinemaBrandController = {
   },
   findDetailCinemaBrand: async (req, res) => {
     try {
-      const detailCinemaBrand = await CinemaBrand.findById(
-        req.params.id
-      ).select("-createdAt -updatedAt -__v").populate({
-        path: "cinemaSystemLocation",
-        select: "-CinemaBrands -__v -createdAt -updatedAt -cinemas",
-      });
+      const detailCinemaBrand = await CinemaBrand.findById(req.body.id)
+        .select("-createdAt -updatedAt -__v")
+        .populate({
+          path: "cinemas",
+          select: "-cinemaBrand -__v -createdAt -updatedAt",
+        });
       res.status(200).json(detailCinemaBrand);
     } catch (error) {
       res.status(500).json(error);
@@ -46,13 +57,14 @@ const CinemaBrandController = {
     try {
       const cinemaBrandByName = await CinemaBrand.find({
         nameCinemaBrand: {
-          $regex: req.params.key.toString(),
+          $regex: req.body.nameCinemaBrand.toString(),
           $options: "i",
         },
-      }).select("-createdAt -updatedAt -__v")
+      })
+        .select("-createdAt -updatedAt -__v")
         .populate({
-          path: "cinemaSystemLocation",
-          select: "-CinemaBrands -__v -createdAt -updatedAt -cinemas",
+          path: "cinemas",
+          select: "-cinemaBrand -__v -createdAt -updatedAt",
         })
         .sort({ createdAt: -1 });
       res.status(200).json(cinemaBrandByName);
@@ -62,13 +74,27 @@ const CinemaBrandController = {
   },
   updateCinemaBrand: async (req, res) => {
     try {
-      const cinemaBrand = await CinemaBrand.findById(req.params.id);
+      const fullUrl = req.protocol + "://" + req.get("host") + "/";
+      const cinemaBrand = await CinemaBrand.findById(req.body.id);
       if (req.file) {
+        if (
+          fs.existsSync(
+            convertPath(cinemaBrand.logoCinemaBrand).slice(
+              cinemaBrand.logoCinemaBrand.indexOf("public")
+            )
+          )
+        ) {
+          fs.unlinkSync(
+            convertPath(cinemaBrand.logoCinemaBrand).slice(
+              cinemaBrand.logoCinemaBrand.indexOf("public")
+            )
+          );
+        }
         await cinemaBrand.updateOne({
           $set: {
             codeCinemaBrand: req.body.codeCinemaBrand,
             nameCinemaBrand: req.body.nameCinemaBrand,
-            logoCinemaBrand: "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path,
+            logoCinemaBrand: fullUrl + req.file.path,
           },
         });
       } else {
@@ -86,20 +112,33 @@ const CinemaBrandController = {
   },
   deleteCinemaBrand: async (req, res) => {
     try {
-      const foundCinemaBrand = await CinemaBrand.findById(req.params.id);
+      const foundCinemaBrand = await CinemaBrand.findById(req.body.id);
 
-      if (foundCinemaBrand.cinemaSystemLocation.length > 0) {
+      if (foundCinemaBrand.cinemas.length > 0) {
         res
           .status(500)
           .json(
             "Delete false, Cinema Brand have " +
               "(" +
-              foundCinemaBrand.cinemaSystemLocation.length +
+              foundCinemaBrand.cinemas.length +
               ")" +
-              " Cinema System Location"
+              " Cinema "
           );
       } else {
-        await CinemaBrand.findByIdAndDelete(req.params.id);
+        if (
+          fs.existsSync(
+            convertPath(foundCinemaBrand.logoCinemaBrand).slice(
+              foundCinemaBrand.logoCinemaBrand.indexOf("public")
+            )
+          )
+        ) {
+          fs.unlinkSync(
+            convertPath(foundCinemaBrand.logoCinemaBrand).slice(
+              foundCinemaBrand.logoCinemaBrand.indexOf("public")
+            )
+          );
+        }
+        await CinemaBrand.findByIdAndDelete(req.body.id);
         res.status(200).json("Delete successfuly");
       }
     } catch (error) {

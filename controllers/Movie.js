@@ -1,4 +1,4 @@
-const { Movie, MovieSchedule } = require("../model/model");
+const { Movie, MovieSchedule, Review, Cinema } = require("../model/model");
 function convertViToEn(str, toUpperCase = false) {
   str = str.toLowerCase();
   str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
@@ -15,23 +15,40 @@ function convertViToEn(str, toUpperCase = false) {
 
   return toUpperCase ? str.toUpperCase() : str;
 }
+const fs = require("fs");
+function convertPath(str) {
+  str = str.replace(/\\/g, "/");
+  return str;
+}
+
 const MovieController = {
   addMovie: async (req, res) => {
     try {
+      const fullUrl = req.protocol + "://" + req.get("host") + "/";
       const newMovie = new Movie({
         codeMovie: req.body.codeMovie,
         nameMovie: req.body.nameMovie,
         slugMovie: convertViToEn(req.body.nameMovie),
         hotMovie: req.body.hotMovie,
+        trainlerMovie: req.body.trainlerMovie,
         showingMovie: req.body.showingMovie,
         comingMovie: req.body.comingMovie,
+        description: req.body.description,
         hotMovie: req.body.hotMovie,
       });
-      if (req.file) {
-        newMovie.pictureMovie = "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path;
-      }
+      console.log(req.files);
 
+      if (req.files) {
+        newMovie.pictureMovie = fullUrl + req.files[0].path;
+        newMovie.thumbnailMovie = fullUrl + req.files[1].path; //thumbnail
+      }
       const savedMovie = await newMovie.save();
+      // if (req.body.cinema) {
+      //   const cinema = Cinema.findById(req.body.cinema);
+      //   await cinema.updateOne({
+      //     $push: { movies: savedMovie._id },
+      //   });
+      // }
 
       res.status(200).json(savedMovie);
     } catch (error) {
@@ -78,11 +95,15 @@ const MovieController = {
         .populate([
           {
             path: "movieSchedule",
-            select: "-movie -__v",
+            select: " -__v",
           },
           {
             path: "review",
-            select: "-Movie -__v -createdAt -updatedAt",
+            select: " -__v -createdAt -updatedAt",
+          },
+          {
+            path: "cinema",
+            select: "-movies -__v -createdAt -updatedAt",
           },
         ])
         .sort({ createdAt: -1 });
@@ -91,10 +112,50 @@ const MovieController = {
       res.status(500).json(error);
     }
   },
+  getAllMovieByPagination: async (req, res) => {
+    try {
+      let pageAsNumber = Number.parseInt(req.query.page);
+      let sizeAsNumber = Number.parseInt(req.query.size);
+      let page = 0;
+      if (!Number.isNaN(pageAsNumber) && pageAsNumber > 0) {
+        page = pageAsNumber;
+      }
+      let size = 4; //default
+      if (!Number.isNaN(sizeAsNumber) && sizeAsNumber > 0) {
+        size = sizeAsNumber;
+      }
+      console.log(sizeAsNumber);
+      const allItem = await Movie.find();
+
+      const allMovie = await Movie.find()
+        .select("-__v")
+        .populate([
+          {
+            path: "movieSchedule",
+            select: "-movie -__v",
+          },
+          {
+            path: "review",
+            select: "-Movie -__v -createdAt -updatedAt",
+          },
+        ])
+        .sort({ createdAt: -1 })
+        .skip(page * size)
+        .limit(size);
+      res.status(200).json({
+        conent: allMovie,
+        pageAt: page,
+        totalItem: allItem.length,
+        totalPages: Math.ceil(allItem.length / size),
+      });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
   findMovieByName: async (req, res) => {
     try {
       const MovieByName = await Movie.find({
-        nameMovie: { $regex: req.params.key.toString(), $options: "i" },
+        nameMovie: { $regex: req.body.nameMovie.toString(), $options: "i" },
       })
         .select("-createdAt -updatedAt -__v -createdAt -updatedAt")
         .populate([
@@ -117,7 +178,11 @@ const MovieController = {
   },
   findMovieDetail: async (req, res) => {
     try {
-      const MovieDetail = await Movie.findById(req.params.id)
+      const slug = req.query.slugMovie;
+      console.log(slug);
+      const MovieDetail = await Movie.findOne({
+        slugMovie: slug,
+      })
         .select("-createdAt -updatedAt -__v ")
         .populate([
           {
@@ -136,52 +201,119 @@ const MovieController = {
   },
   updateMovie: async (req, res) => {
     try {
-      const updateMovie = await Movie.findById(req.params.id);
-
-      await updateMovie.updateOne({
-        $set: {
-          codeMovie: req.body.codeMovie,
-          nameMovie: req.body.nameMovie,
-          slugMovie: convertViToEn(req.body.nameMovie),
-          hotMovie: req.body.hotMovie,
-          showingMovie: req.body.showingMovie,
-          comingMovie: req.body.comingMovie,
-          hotMovie: req.body.hotMovie,
-        },
-      });
-      if (req.file) {
-        await updateMovie.updateOne({
-          pictureMovie: "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path,
+      const fullUrl = req.protocol + "://" + req.get("host") + "/";
+      const updateMovie = await Movie.findById(req.body.id);
+      console.log(updateMovie);
+      if (updateMovie == null) {
+        fs.unlinkSync(convertPath(req.files[0].path));
+        fs.unlinkSync(convertPath(req.files[1].path));
+        return res.status(404).json("Not found");
+      } else {
+        if (req.files.length > 0) {
+          if (
+            fs.existsSync(
+              convertPath(updateMovie.pictureMovie).slice(
+                updateMovie.pictureMovie.indexOf("public")
+              )
+            )
+          ) {
+            fs.unlinkSync(
+              convertPath(updateMovie.pictureMovie).slice(
+                updateMovie.pictureMovie.indexOf("public")
+              )
+            );
+          }
+          if (
+            fs.existsSync(
+              convertPath(updateMovie.thumbnailMovie).slice(
+                updateMovie.thumbnailMovie.indexOf("public")
+              )
+            )
+          ) {
+            fs.unlinkSync(
+              convertPath(updateMovie.thumbnailMovie).slice(
+                updateMovie.thumbnailMovie.indexOf("public")
+              )
+            );
+          }
+          await updateMovie.update({
+            pictureMovie: fullUrl + req.files[0].path,
+            thumbnailMovie: fullUrl + req.files[1].path,
+          });
+        }
+        if (req.body.nameMovie) {
+          await updateMovie.update({
+            $set: {
+              slugMovie: convertViToEn(req.body.nameMovie),
+            },
+          });
+        }
+        await updateMovie.update({
+          $set: {
+            codeMovie: req.body.codeMovie,
+            nameMovie: req.body.nameMovie,
+            hotMovie: req.body.hotMovie,
+            trainlerMovie: req.body.trainlerMovie,
+            showingMovie: req.body.showingMovie,
+            comingMovie: req.body.comingMovie,
+            description: req.body.description,
+          },
         });
+        res.status(200).json("Update successfuly");
       }
-      res.status(200).json("Update successfuly");
     } catch (error) {
       res.status(500).json(error);
     }
   },
   deleteMovie: async (req, res) => {
     try {
-      const foundMovie = await Movie.findById(req.params.id);
-      if (foundMovie.Movie.length > 0) {
+      const foundMovie = await Movie.findById(req.body.id);
+      if (foundMovie.review.length > 0) {
         res
           .status(500)
           .json(
-            "Delete false, Movie Schedule have " +
+            "Delete false, Movie have " +
               "(" +
-              foundMovie.Movie.length +
+              foundMovie.review.length +
               ")" +
-              " Movie "
+              " review "
           );
       } else {
-        await CinemaRoom.updateMany(
+        await Review.updateMany(
           {
-            Movie: req.params.id,
+            movie: req.body.id,
           },
           {
-            $pull: { Movie: req.params.id },
+            $pull: { movie: req.body.id },
           }
         );
-        await Movie.findByIdAndDelete(req.params.id);
+        if (
+          fs.existsSync(
+            convertPath(foundMovie.pictureMovie).slice(
+              foundMovie.pictureMovie.indexOf("public")
+            )
+          )
+        ) {
+          fs.unlinkSync(
+            convertPath(foundMovie.pictureMovie).slice(
+              foundMovie.pictureMovie.indexOf("public")
+            )
+          );
+        }
+        if (
+          fs.existsSync(
+            convertPath(foundMovie.thumbnailMovie).slice(
+              foundMovie.thumbnailMovie.indexOf("public")
+            )
+          )
+        ) {
+          fs.unlinkSync(
+            convertPath(foundMovie.thumbnailMovie).slice(
+              foundMovie.thumbnailMovie.indexOf("public")
+            )
+          );
+        }
+        await Movie.findByIdAndDelete(req.body.id);
         res.status(200).json("Delete successfuly");
       }
     } catch (error) {
@@ -190,9 +322,9 @@ const MovieController = {
   },
   deleteScheduleOfMovie: async (req, res) => {
     try {
-      const findMovie = await Movie.findById(req.params.movieID);
+      const findMovie = await Movie.findById(req.body.movieID);
       const checkScheduleOfMovie = findMovie.movieSchedule.find(
-        (resultSchedule) => resultSchedule._id == req.params.scheduleID
+        (resultSchedule) => resultSchedule._id == req.body.scheduleID
       );
       if (!checkScheduleOfMovie) {
         return res.status(400).json("Error,the movie hasn't schedules");
@@ -200,18 +332,18 @@ const MovieController = {
 
       await Movie.updateMany(
         {
-          _id: req.params.movieID,
+          _id: req.body.movieID,
         },
         {
-          $pull: { movieSchedule: req.params.scheduleID },
+          $pull: { movieSchedule: req.body.scheduleID },
         }
       );
       await MovieSchedule.updateMany(
         {
-          _id: req.params.scheduleID,
+          _id: req.body.scheduleID,
         },
         {
-          $pull: { movie: req.params.movieID },
+          $pull: { movie: req.body.movieID },
         }
       );
       res.status(200).json("Delete successfuly");

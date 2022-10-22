@@ -1,23 +1,27 @@
-const { Cinema, CinemaSystemLocation } = require("../model/model");
+const { Cinema, CinemaBrand } = require("../model/model");
+const fs = require("fs");
+function convertPath(str) {
+  str = str.replace(/\\/g, "/");
+  return str;
+}
 const CinemaController = {
   addCinema: async (req, res) => {
     try {
+      const fullUrl = req.protocol + "://" + req.get("host") + "/";
       const newCinema = new Cinema({
         codeCinema: req.body.codeCinema,
         nameCinema: req.body.nameCinema,
         addressCinema: req.body.addressCinema,
         hotlineCinema: req.body.hotlineCinema,
-        cinemaSystemLocation: req.body.cinemaSystemLocation,
+        cinemaBrand: req.body.cinemaBrand,
       });
       if (req.file) {
-        newCinema.pictureCinema = "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path;
+        newCinema.pictureCinema = fullUrl + req.file.path;
       }
       const savedCinema = await newCinema.save();
-      if (req.body.cinemaSystemLocation) {
-        const cinemaSystemLocation = CinemaSystemLocation.findById(
-          req.body.cinemaSystemLocation
-        );
-        await cinemaSystemLocation.updateOne({
+      if (req.body.cinemaBrand) {
+        const cinemaBrands = CinemaBrand.findById(req.body.cinemaBrand);
+        await cinemaBrands.updateOne({
           $push: { cinemas: savedCinema._id },
         });
       }
@@ -32,17 +36,16 @@ const CinemaController = {
         .select("-createdAt -updatedAt -__v")
         .populate([
           {
-            path: "cinemaSystemLocation",
-
+            path: "cinemaBrand",
             select: "-cinemas -__v -createdAt -updatedAt",
-            populate: {
-              path: "CinemaBrands",
-              select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
-            },
           },
           {
-            path: "cinemaRoom",
-            select: " -__v -createdAt -updatedAt",
+            path: "scheduls",
+            select: " -__v  -createdAt -updatedAt",
+          },
+          {
+            path: "movies",
+            select: " -__v  -createdAt -updatedAt",
           },
         ])
         .sort({ createdAt: -1 });
@@ -54,7 +57,7 @@ const CinemaController = {
   findCinemaByName: async (req, res) => {
     try {
       const cinemaByName = await Cinema.find({
-        nameCinema: { $regex: req.params.key.toString(), $options: "i" },
+        nameCinema: { $regex: req.body.nameCinema.toString(), $options: "i" },
       })
         .select("-createdAt -updatedAt -__v -createdAt -updatedAt")
         .populate([
@@ -63,13 +66,17 @@ const CinemaController = {
 
             select: "-cinemas -__v -createdAt -updatedAt",
             populate: {
-              path: "CinemaBrands",
-              select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
+              path: "cinemaBrand",
+              select: "-__v -createdAt -updatedAt",
             },
           },
           {
-            path: "cinemaRoom",
-            select: " -__v -createdAt -updatedAt",
+            path: "scheduls",
+            select: " -__v  -createdAt -updatedAt",
+          },
+          {
+            path: "movies",
+            select: " -__v  -createdAt -updatedAt",
           },
         ])
         .sort({
@@ -82,7 +89,7 @@ const CinemaController = {
   },
   findCinemaDetail: async (req, res) => {
     try {
-      const cinemaDetail = await Cinema.findById(req.params.id)
+      const cinemaDetail = await Cinema.findById(req.body.id)
         .select("-createdAt -updatedAt -__v ")
         .populate([
           {
@@ -90,13 +97,17 @@ const CinemaController = {
 
             select: "-cinemas -__v -createdAt -updatedAt",
             populate: {
-              path: "CinemaBrands",
-              select: "-cinemaSystemLocation -__v -createdAt -updatedAt",
+              path: "cinemaBrand",
+              select: "-__v -createdAt -updatedAt",
             },
           },
           {
-            path: "cinemaRoom",
-            select: " -__v -createdAt -updatedAt",
+            path: "scheduls",
+            select: " -__v  -createdAt -updatedAt",
+          },
+          {
+            path: "movies",
+            select: " -__v  -createdAt -updatedAt",
           },
         ]);
       res.status(200).json(cinemaDetail);
@@ -106,16 +117,30 @@ const CinemaController = {
   },
   updateCinema: async (req, res) => {
     try {
-      const updateCinema = await Cinema.findById(req.params.id);
+      const fullUrl = req.protocol + "://" + req.get("host") + "/";
+      const updateCinema = await Cinema.findById(req.body.id);
       if (req.file) {
+        if (
+          fs.existsSync(
+            convertPath(updateCinema.pictureCinema).slice(
+              updateCinema.pictureCinema.indexOf("public")
+            )
+          )
+        ) {
+          fs.unlinkSync(
+            convertPath(updateCinema.pictureCinema).slice(
+              updateCinema.pictureCinema.indexOf("public")
+            )
+          );
+        }
         await updateCinema.updateOne({
           $set: {
             codeCinema: req.body.codeCinema,
             nameCinema: req.body.nameCinema,
             addressCinema: req.body.addressCinema,
             hotlineCinema: req.body.hotlineCinema,
-            cinemaSystemLocation: req.body.cinemaSystemLocation,
-            pictureCinema: "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path,
+            cinemaBrand: req.body.cinemaBrand,
+            pictureCinema: fullUrl + req.file.path,
           },
         });
       } else {
@@ -125,43 +150,65 @@ const CinemaController = {
             nameCinema: req.body.nameCinema,
             addressCinema: req.body.addressCinema,
             hotlineCinema: req.body.hotlineCinema,
-            cinemaSystemLocation: req.body.cinemaSystemLocation,
+            cinemaBrand: req.body.cinemaBrand,
           },
         });
       }
-      res.status(200).json("Update successfuly");
+      res.status(200).json("Update successfully");
     } catch (error) {
       res.status(500).json(error);
     }
   },
   deleteCinema: async (req, res) => {
     try {
-      const foundCinema = await Cinema.findById(
-        req.params.id
-      );
-      if (foundCinema.cinemaRoom.length > 0) {
+      const foundCinema = await Cinema.findById(req.body.id);
+
+      if (foundCinema.movies.length > 0) {
         res
           .status(500)
           .json(
             "Delete false, Cinema have " +
               "(" +
-              foundCinema.cinemaRoom.length +
+              foundCinema.movies.length +
               ")" +
-              " cinema room "
+              " movies "
+          );
+      } else if (foundCinema.scheduls.length > 0) {
+        res
+          .status(500)
+          .json(
+            "Delete false, Cinema have " +
+              "(" +
+              foundCinema.scheduls.length +
+              ")" +
+              " scheduls "
           );
       } else {
-        await CinemaSystemLocation.updateMany(
+        await CinemaBrand.updateMany(
           {
-            cinemas: req.params.id,
+            cinemas: req.body.id,
           },
           {
-            $pull: { cinemas: req.params.id },
+            $pull: { cinemas: req.body.id },
           }
         );
-        await Cinema.findByIdAndDelete(req.params.id);
+        if (
+          fs.existsSync(
+            convertPath(foundCinema.pictureCinema).slice(
+              foundCinema.pictureCinema.indexOf("public")
+            )
+          )
+        ) {
+          fs.unlinkSync(
+            convertPath(foundCinema.pictureCinema).slice(
+              foundCinema.pictureCinema.indexOf("public")
+            )
+          );
+        }
+        //file removed
+        await Cinema.findByIdAndDelete(req.body.id);
         res.status(200).json("Delete successfuly");
       }
-     
     } catch (error) {
       res.status(500).json(error);
     }

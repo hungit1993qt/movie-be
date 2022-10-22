@@ -1,32 +1,32 @@
 const UserController = require("../controllers/User");
 
 const router = require("express").Router();
-const upload = require("../middleware/uploadPicture");
+const upload = require("../middleware/uploadPictureUser");
 const verifyToken = require("../middleware/verifyToken");
 //
 router.post(
-  "/",
+  "/add/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
   upload.single("avatar"),
   UserController.addUser
 );
-router.get("/", verifyToken.verifyTokenAPI, UserController.getAllUser);
-router.get("/:key", verifyToken.verifyTokenAPI, UserController.findUserByName);
+router.get("/all/", verifyToken.verifyTokenAPI, UserController.getAllUser);
+router.get("/search-name/", verifyToken.verifyTokenAPI, UserController.findUserByName);
 router.get(
-  "/detail/:id",
+  "/detail/",
   verifyToken.verifyTokenAPI,
   UserController.findUserDetail
 );
 router.put(
-  "/:id",
+  "/update/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
   upload.single("avatar"),
   UserController.updateUser
 );
 router.delete(
-  "/:id",
+  "/delete/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
   UserController.deleteUser

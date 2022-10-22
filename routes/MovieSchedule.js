@@ -4,34 +4,34 @@ const router = require("express").Router();
 const verifyToken = require("../middleware/verifyToken");
 
 router.post(
-  "/",
+  "/add/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
   MovieScheduleController.addMovieSchedule
 );
 router.get(
-  "/",
+  "/all/",
   verifyToken.verifyTokenAPI,
   MovieScheduleController.getAllMovieSchedule
 );
 router.get(
-  "/:key",
+  "/search-name/",
   verifyToken.verifyTokenAPI,
   MovieScheduleController.findMovieScheduleByName
 );
 router.get(
-  "/detail/:id",
+  "/detail/",
   verifyToken.verifyTokenAPI,
   MovieScheduleController.findMovieScheduleDetail
 );
 router.put(
-  "/:id",
+  "/update/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
   MovieScheduleController.updateMovieSchedule
 );
 router.delete(
-  "/:id",
+  "/delete/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
   MovieScheduleController.deleteMovieSchedule

@@ -49,7 +49,7 @@ const ReviewController = {
   findReviewByName: async (req, res) => {
     try {
       const ReviewByName = await Review.find({
-        nameReview: { $regex: req.params.key.toString(), $options: "i" },
+        nameReview: { $regex: req.body.nameReview.toString(), $options: "i" },
       })
         .select("-__v")
         .populate([
@@ -72,7 +72,7 @@ const ReviewController = {
   },
   findReviewDetail: async (req, res) => {
     try {
-      const ReviewDetail = await Review.findById(req.params.id)
+      const ReviewDetail = await Review.findById(req.body.id)
         .select("-__v")
         .populate([
           {
@@ -91,12 +91,12 @@ const ReviewController = {
   },
   updateReview: async (req, res) => {
     try {
-      const updateReview = await Review.findById(req.params.id);
+      const updateReview = await Review.findById(req.body.id);
 
       await updateReview.updateOne({
         $set: {
-          contentReview: req.body.codeReview,
-          rankReview: req.body.nameReview,
+          contentReview: req.body.contentReview,
+          rankReview: req.body.rankReview,
         },
       });
 
@@ -109,21 +109,21 @@ const ReviewController = {
     try {
       await Movie.updateMany(
         {
-          review: req.params.id,
+          review: req.body.id,
         },
         {
-          $pull: { review: req.params.id },
+          $pull: { review: req.body.id },
         }
       );
       await User.updateMany(
         {
-          reviews: req.params.id,
+          reviews: req.body.id,
         },
         {
-          $pull: { reviews: req.params.id },
+          $pull: { reviews: req.body.id },
         }
       );
-      await Review.findByIdAndDelete(req.params.id);
+      await Review.findByIdAndDelete(req.body.id);
       res.status(200).json("Delete successfuly");
     } catch (error) {
       res.status(500).json(error);

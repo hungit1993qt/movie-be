@@ -1,48 +1,54 @@
 const MovieController = require("../controllers/Movie");
-const upload = require("../middleware/uploadPicture");
+const upload = require("../middleware/uploadPictureMovie");
+const upload2 = require("../middleware/uploadPictureMovie");
 const router = require("express").Router();
 const verifyToken = require("../middleware/verifyToken");
 
 router.post(
-  "/",
+  "/add/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
-  upload.single("pictureMovie"),
+  upload.any([{ name: "pictureMovie" }, { name: "thumbnailMovie" }]),
   MovieController.addMovie
 );
 router.post(
-  "/movie-to-schelude",
+  "/add-movie-to-schelude",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
 
   MovieController.addMovieToSchedele
 );
-router.get("/", verifyToken.verifyTokenAPI, MovieController.getAllMovie);
+router.get("/all/", verifyToken.verifyTokenAPI, MovieController.getAllMovie);
 router.get(
-  "/:key",
+  "/pagination",
+  verifyToken.verifyTokenAPI,
+  MovieController.getAllMovieByPagination
+);
+router.get(
+  "/search-name/",
   verifyToken.verifyTokenAPI,
   MovieController.findMovieByName
 );
 router.get(
-  "/detail/:id",
+  "/detail/",
   verifyToken.verifyTokenAPI,
   MovieController.findMovieDetail
 );
 router.put(
-  "/:id",
+  "/update/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
-  upload.single("pictureMovie"),
+  upload.any([{ name: "pictureMovie" }, { name: "thumbnailMovie" }]),
   MovieController.updateMovie
 );
 router.delete(
-  "/:id",
+  "/delete/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
   MovieController.deleteMovie
 );
 router.delete(
-  "/:movieID/:scheduleID",
+  "/delete-movie-to-schelude/",
   verifyToken.verifyTokenAPI,
   //   verifyToken.verifyTokenManager,
   MovieController.deleteScheduleOfMovie

@@ -1,7 +1,13 @@
 const { Review, User } = require("../model/model");
+const fs = require("fs");
+function convertPath(str) {
+  str = str.replace(/\\/g, "/");
+  return str;
+}
 const UserController = {
   addUser: async (req, res) => {
     try {
+      const fullUrl = req.protocol + "://" + req.get("host") + "/";
       const newUser = new User({
         accountUser: req.body.accountUser,
         passwordUser: req.body.passwordUser,
@@ -10,7 +16,7 @@ const UserController = {
         phoneNumberUser: req.body.phoneNumberUser,
       });
       if (req.file) {
-        newUser.avatar = "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path;
+        newUser.avatar = fullUrl + req.file.path;
       }
       const savedUser = await newUser.save();
 
@@ -36,7 +42,7 @@ const UserController = {
   findUserByName: async (req, res) => {
     try {
       const UserByName = await User.find({
-        accountUser: { $regex: req.params.key.toString(), $options: "i" },
+        accountUser: { $regex: req.body.accountUser.toString(), $options: "i" },
       })
         .select("-__v")
         .populate([
@@ -59,7 +65,7 @@ const UserController = {
   },
   findUserDetail: async (req, res) => {
     try {
-      const UserDetail = await User.findById(req.params.id)
+      const UserDetail = await User.findById(req.body.id)
         .select("-__v")
         .populate([
           {
@@ -78,15 +84,30 @@ const UserController = {
   },
   updateUser: async (req, res) => {
     try {
-      const updateUser = await User.findById(req.params.id);
+      const fullUrl = req.protocol + "://" + req.get("host") + "/";
+      const updateUser = await User.findById(req.body.id);
       if (req.file) {
+        if (
+          fs.existsSync(
+            convertPath(updateUser.avatar).slice(
+              updateUser.avatar.indexOf("public")
+            )
+          )
+        ) {
+          fs.unlinkSync(
+            convertPath(updateUser.avatar).slice(
+              updateUser.avatar.indexOf("public")
+            )
+          );
+        }
         await updateUser.updateOne({
           $set: {
             accountUser: req.body.accountUser,
             passwordUser: req.body.passwordUser,
             nameUser: req.body.nameUser,
+            phoneNumberUser: req.body.phoneNumberUser,
             emailUser: req.body.emailUser,
-            avatar: "https://hungit1993qt-movie-be.herokuapp.com/" + req.file.path,
+            avatar: fullUrl + req.file.path,
           },
         });
       } else {
@@ -94,6 +115,7 @@ const UserController = {
           $set: {
             accountUser: req.body.accountUser,
             passwordUser: req.body.passwordUser,
+            phoneNumberUser: req.body.phoneNumberUser,
             nameUser: req.body.nameUser,
             emailUser: req.body.emailUser,
           },
@@ -107,27 +129,40 @@ const UserController = {
   //delete not yet
   deleteUser: async (req, res) => {
     try {
-      const foundUser = await User.findById(req.params.id);
-      if (foundUser.UserRoom.length > 0) {
+      const foundUser = await User.findById(req.body.id);
+      if (foundUser.reviews.length > 0) {
         res
           .status(500)
           .json(
             "Delete false, User have " +
               "(" +
-              foundUser.UserRoom.length +
+              foundUser.reviews.length +
               ")" +
-              " User room "
+              " Review "
           );
       } else {
-        await UserSystemLocation.updateMany(
+        await Review.updateMany(
           {
-            Users: req.params.id,
+            user: req.body.id,
           },
           {
-            $pull: { Users: req.params.id },
+            $pull: { user: req.body.id },
           }
         );
-        await User.findByIdAndDelete(req.params.id);
+        if (
+          fs.existsSync(
+            convertPath(foundUser.avatar).slice(
+              foundUser.avatar.indexOf("public")
+            )
+          )
+        ) {
+          fs.unlinkSync(
+            convertPath(foundUser.avatar).slice(
+              foundUser.avatar.indexOf("public")
+            )
+          );
+        }
+        await User.findByIdAndDelete(req.body.id);
         res.status(200).json("Delete successfuly");
       }
     } catch (error) {

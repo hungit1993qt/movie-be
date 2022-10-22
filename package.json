@@ -7,8 +7,8 @@
     "node": "16.x"
   },
   "scripts": {
-    "start": "nodemon index.js",
-    "start:dev": "nodemon --watch",
+    "start": "node index.js",
+    "start:dev": "node --watch",
     "watch": "node-sass --watch public/scss/app.scss public/css/app.css"
   },
   "author": "",

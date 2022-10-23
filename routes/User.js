@@ -11,6 +11,12 @@ router.post(
   upload.single("avatar"),
   UserController.addUser
 );
+router.post(
+  "/login/",
+  verifyToken.verifyTokenAPI,
+  //   verifyToken.verifyTokenManager,
+  UserController.login
+);
 router.get("/all/", verifyToken.verifyTokenAPI, UserController.getAllUser);
 router.get("/search-name/", verifyToken.verifyTokenAPI, UserController.findUserByName);
 router.get(

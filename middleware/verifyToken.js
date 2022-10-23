@@ -1,42 +1,42 @@
 const jwt = require("jsonwebtoken");
 const verifyToken = {
-  verifyTokenManager: (req, res, next) => {
+  verifyTokenUser: (req, res, next) => {
     const tokenAuths = req.headers[`tokenauth`];
-    
+
     if (tokenAuths) {
       const accessToken = tokenAuths.split(" ")[1];
-      jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, manager) => {
+      jwt.verify(accessToken, process.env.JWT_ACCESS_KEY, (err, user) => {
         if (err) {
-          res.status(403).json("Token auth không đúng");
+          res.status(403).json("Token auth wrong");
         }
-        req.manager = manager;
+        req.user = user;
         next();
       });
     } else {
-      res.status(401).json("Bạn chưa xác thực bằng tokenAuth");
+      res.status(401).json("You have not authenticated with tokenAuth");
     }
   },
   verifyTokenAdmin: (req, res, next) => {
-    verifyToken.verifyTokenManager(req, res, () => {
-      if (req.manager.id == req.params.id || req.manager.admin) {
+    verifyToken.verifyTokenUser(req, res, () => {
+      if (req.user.id == req.params.id || req.user.isAdmin) {
         next();
       } else {
-        res.status(403).json("Bạn không phải là Admin");
+        res.status(403).json("You are not an Admin");
       }
     });
   },
   verifyTokenAPI: (req, res, next) => {
     const token = req.headers.token;
-    
+
     if (token) {
       const accessToken = token.split(" ")[1];
       if (accessToken == process.env.VERIFY_TOKEN) {
         next();
       } else {
-        res.status(403).json("Token không đúng");
+        res.status(403).json("Token request api is not correct");
       }
     } else {
-      res.status(401).json("Bạn chưa xác thực bằng token");
+      res.status(401).json("You have not authenticated with the token api");
     }
   },
 };

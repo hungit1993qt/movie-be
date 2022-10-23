@@ -186,5 +186,35 @@ const UserController = {
       res.status(500).json(error);
     }
   },
+  login: async (req, res) => {
+    try {
+      const user = await User.findOne({ accountUser: req.body.accountUser });
+     
+      if (!user) {
+        res.status(404).json("Wrong account");
+      }
+      const validPassword = await bcrypt.compare(
+        req.body.passwordUser,
+        user.passwordUser
+      );
+      if (!validPassword) {
+        res.status(404).json("Wrong password");
+      }
+      if (user && validPassword) {
+        const accessToken = jwt.sign(
+          {
+            id: user.id,
+            isAdmin: user.isAdmin,
+          },
+          process.env.JWT_ACCESS_KEY,
+          { expiresIn: "30d" }
+        );
+        const {__v, passwordUser, ...others } = user._doc;
+        res.status(200).json({ ...others, accessToken });
+      }
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
 };
 module.exports = UserController;

@@ -70,6 +70,10 @@ const CinemaController = {
           {
             path: "movies",
             select: " -__v  -createdAt -updatedAt",
+            populate: {
+              path: "review",
+              select: " -__v ",
+            },
           },
         ])
         .sort({ createdAt: -1 });

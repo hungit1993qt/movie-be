@@ -35,8 +35,8 @@ const MovieController = {
         comingMovie: req.body.comingMovie,
         description: req.body.description,
         hotMovie: req.body.hotMovie,
+        timeMovie: req.body.timeMovie,
       });
-      console.log(req.files);
 
       if (req.files) {
         newMovie.pictureMovie = fullUrl + req.files[0].path;
@@ -111,14 +111,13 @@ const MovieController = {
           {
             path: "movieSchedule",
             select: "-movie -__v",
-          },        
+          },
           {
             path: "review",
             select: "-movie -__v",
             populate: {
               path: "user",
               select: "-reviews -__v -createdAt -updatedAt",
-             
             },
           },
         ])
@@ -149,14 +148,13 @@ const MovieController = {
           {
             path: "movieSchedule",
             select: "-movie -__v",
-          },        
+          },
           {
             path: "review",
             select: "-movie -__v -createdAt -updatedAt",
             populate: {
               path: "user",
               select: "-reviews -__v -createdAt -updatedAt",
-             
             },
           },
         ])
@@ -183,14 +181,13 @@ const MovieController = {
           {
             path: "movieSchedule",
             select: "-movie -__v",
-          },        
+          },
           {
             path: "review",
             select: "-movie -__v -createdAt -updatedAt",
             populate: {
               path: "user",
               select: "-reviews -__v -createdAt -updatedAt",
-             
             },
           },
         ])
@@ -214,14 +211,13 @@ const MovieController = {
           {
             path: "movieSchedule",
             select: "-movie -__v",
-          },        
+          },
           {
             path: "review",
             select: "-movie -__v",
             populate: {
               path: "user",
               select: "-reviews -__v -createdAt -updatedAt",
-             
             },
           },
         ]);
@@ -288,6 +284,7 @@ const MovieController = {
             showingMovie: req.body.showingMovie,
             comingMovie: req.body.comingMovie,
             description: req.body.description,
+            timeMovie: req.body.timeMovie,
           },
         });
         res.status(200).json("Update successfuly");

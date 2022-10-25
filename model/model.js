@@ -144,6 +144,10 @@ const MovieSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    timeMovie: {
+      type: String,
+      required: true,
+    },
     cinema: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Cinema",

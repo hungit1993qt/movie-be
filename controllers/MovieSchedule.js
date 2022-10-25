@@ -3,10 +3,9 @@ const MovieScheduleController = {
   addMovieSchedule: async (req, res) => {
     try {
       const newMovieSchedule = new MovieSchedule({
-        codeMovieSchedule: req.body.codeMovieSchedule,
-        timeDateMovieSchedule: req.body.timeDateMovieSchedule,
+        dateSchedule: req.body.dateSchedule,
+        timeSchedule: req.body.timeSchedule,
         price: req.body.price,
-        cinemaRoom: req.body.cinemaRoom,
       });
 
       const savedMovieSchedule = await newMovieSchedule.save();

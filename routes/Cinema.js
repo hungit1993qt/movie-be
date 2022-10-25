@@ -26,6 +26,13 @@ router.post(
   upload.single("pictureCinema"),
   CinemaController.addCinema
 );
+router.post(
+  "/cinema-add-movie/",
+  verifyToken.verifyTokenAPI,
+  //   verifyToken.verifyTokenManager,
+  upload.single("pictureCinema"),
+  CinemaController.cinemaAddMovie
+);
 
 router.put(
   "/update/",

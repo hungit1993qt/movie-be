@@ -71,14 +71,16 @@ const CinemaSchema = new mongoose.Schema(
 
 const MovieScheduleSchema = new mongoose.Schema(
   {
-    codeMovieSchedule: {
-      type: String,
-      required: true,
-    },
-    timeDateMovieSchedule: {
+    dateSchedule: {
       type: Date,
       required: true,
     },
+    timeSchedule: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
     price: {
       type: Number,
       required: true,

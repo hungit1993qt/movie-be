@@ -1,4 +1,4 @@
-const { Cinema, CinemaBrand } = require("../model/model");
+const { Cinema, CinemaBrand, Movie } = require("../model/model");
 const fs = require("fs");
 function convertPath(str) {
   str = str.replace(/\\/g, "/");
@@ -30,6 +30,30 @@ const CinemaController = {
       res.status(500).json(error);
     }
   },
+  cinemaAddMovie: async (req, res) => {
+    try {
+      const findMovie = await Movie.findById(req.body.movieId);
+      const findCinema = await Cinema.findById(req.body.cinemaId);
+      const checkMovie = findCinema.movies.find(
+        (resultMovie) => resultMovie._id == req.body.movieId
+      );
+
+      if (checkMovie) {
+        return res.status(400).json("Duplicate,the cinema has been movie");
+      }
+
+      await findCinema.updateOne({
+        $push: { movies: req.body.movieId },
+      });
+      await findMovie.updateOne({
+        $push: { cinema: req.body.cinemaId },
+      });
+      res.status(200).json("Cinema add movie successfully");
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
+  cinemaAddSchedule: async (req, res) => {},
   getAllCinema: async (req, res) => {
     try {
       const allCinema = await Cinema.find()

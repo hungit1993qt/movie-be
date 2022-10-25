@@ -32,6 +32,10 @@ const CinemaBrandController = {
           populate: {
             path: "movies",
             select: "-cinemas -__v -createdAt -updatedAt",
+            populate: {
+              path: "review",
+              select: " -__v ",
+            },
           },
         })
         .sort({ createdAt: -1 });
